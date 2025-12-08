@@ -48,3 +48,15 @@ def test_plan_route_errors(client):
     # missing fields
     r = client.post('/api/routeiq/plan', json={})
     assert r.status_code == 400
+
+
+def test_delete_blocked_in_demo_mode(client):
+    # The app's before_request should block DELETE when DEMO_MODE is True
+    original = app.DEMO_MODE
+    app.DEMO_MODE = True
+    try:
+        r = client.delete('/api/routeiq/health')
+        assert r.status_code == 403
+        assert 'delete disabled' in r.json.get('error', '').lower()
+    finally:
+        app.DEMO_MODE = original

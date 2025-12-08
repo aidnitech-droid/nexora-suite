@@ -349,3 +349,31 @@ def test_check_availability(client):
     assert response.status_code == 200
     assert 'available_slots' in response.json
 
+
+def test_delete_blocked_in_demo_mode(client):
+    # create calendar and appointment
+    cal_response = client.post('/api/bookings/calendars', json={'name': 'Demo Calendar'})
+    cal_id = cal_response.json['id']
+
+    now = datetime.utcnow()
+    start = now + timedelta(hours=1)
+    end = start + timedelta(hours=1)
+
+    apt_response = client.post('/api/bookings/appointments', json={
+        'calendar_id': cal_id,
+        'title': 'Demo Blocked Delete',
+        'start_time': start.isoformat(),
+        'end_time': end.isoformat()
+    })
+    apt_id = apt_response.json['id']
+
+    # enable demo mode at runtime and attempt delete
+    original = app.DEMO_MODE
+    app.DEMO_MODE = True
+    try:
+        r = client.delete(f'/api/bookings/appointments/{apt_id}')
+        assert r.status_code == 403
+        assert 'delete disabled' in r.json.get('error', '').lower()
+    finally:
+        app.DEMO_MODE = original
+
