@@ -1,0 +1,72 @@
+:root{
+  --nexora-primary: #1f7a73; /* deep teal */
+  --nexora-accent: #4caf50; /* green accent */
+  --nexora-dark: #123f3d;
+  --nexora-light: #eaf7f6;
+  --nexora-contrast: #ffffff;
+}
+
+/* Navbar */
+.navbar.bg-primary{
+  background: linear-gradient(90deg,var(--nexora-primary), #2b8f86) !important;
+}
+.navbar .navbar-brand .nexora-logo{
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+}
+.nexora-brand-text{
+  font-weight: 700;
+  color: var(--nexora-contrast);
+  letter-spacing: 0.2px;
+}
+
+/* Buttons */
+.btn-primary{
+  background: linear-gradient(180deg,var(--nexora-accent), #3da64a);
+  border: none;
+}
+
+/* Pricing banner */
+.pricing-banner{
+  background: linear-gradient(90deg, rgba(79, 195, 140, 0.12), rgba(31,122,115,0.08));
+  border: 1px solid rgba(76,175,80,0.12);
+  color: var(--nexora-dark);
+}
+
+/* Demo banner */
+.demo-banner{
+  background: #fff3cd;
+  border-color: #ffeeba;
+}
+
+/* Card accents */
+.card {
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(13, 40, 38, 0.06);
+}
+
+/* Hero / CTA */
+.hero-cta{
+  background: linear-gradient(135deg, var(--nexora-primary), var(--nexora-accent));
+  color: white;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* Small responsive tweaks */
+@media (max-width:767px){
+  .nexora-logo{height:28px}
+  .nexora-brand-text{font-size:16px}
+}
+
+/* Utility */
+.text-nexora{color:var(--nexora-dark)!important}
+
+/* Footer theme (if present) */
+.site-footer{
+  background: linear-gradient(180deg, #0f3b38, #0b2d2a);
+  color: #dfeff0;
+  padding: 30px 0;
+}
