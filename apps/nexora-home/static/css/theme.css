@@ -70,3 +70,6 @@
   color: #dfeff0;
   padding: 30px 0;
 }
+
+.site-footer p{margin-bottom:0}
+.site-footer .footer-link{color:#dff7f5; text-decoration:underline}
