@@ -23,6 +23,9 @@ app.config['SECRET_KEY'] = os.getenv('NEXORA_HOME_SECRET', 'dev-secret')
 
 db = SQLAlchemy(app)
 
+# Initialization flag to ensure db.create_all() runs only once
+_initialized = False
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -64,7 +67,21 @@ def role_required(roles):
 
 
 @app.before_request
-def block_deletes_home():
+def initialize_and_block_deletes():
+    global _initialized
+    # Initialize on first request
+    if not _initialized:
+        db.create_all()
+        # Seed demo user when running in demo mode
+        if DEMO_MODE:
+            demo = User.query.filter((User.username == DEMO_CREDENTIALS['username']) | (User.email == DEMO_CREDENTIALS['email'])).first()
+            if not demo:
+                demo = User(username=DEMO_CREDENTIALS['username'], email=DEMO_CREDENTIALS['email'], role=DEMO_CREDENTIALS['role'])
+                demo.set_password(DEMO_CREDENTIALS['password'])
+                db.session.add(demo)
+                db.session.commit()
+        _initialized = True
+    # Block DELETE requests in demo mode
     if DEMO_MODE and request.method == 'DELETE':
         return jsonify({'error': 'DELETE disabled in demo mode'}), 403
 
@@ -72,19 +89,6 @@ def block_deletes_home():
 @app.context_processor
 def inject_demo_flag():
     return {'demo_mode': DEMO_MODE}
-
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    # Seed demo user when running in demo mode
-    if DEMO_MODE:
-        demo = User.query.filter((User.username == DEMO_CREDENTIALS['username']) | (User.email == DEMO_CREDENTIALS['email'])).first()
-        if not demo:
-            demo = User(username=DEMO_CREDENTIALS['username'], email=DEMO_CREDENTIALS['email'], role=DEMO_CREDENTIALS['role'])
-            demo.set_password(DEMO_CREDENTIALS['password'])
-            db.session.add(demo)
-            db.session.commit()
 
 
 @app.route('/')
