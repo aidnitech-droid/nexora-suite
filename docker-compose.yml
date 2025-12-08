@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  nexora-home:
+    build: ./apps/nexora-home
+    ports:
+      - "5060:5060"
+    environment:
+      - DEMO_MODE=${DEMO_MODE:-true}
+    volumes:
+      - ./apps/nexora-home:/app
+
+  nexora-bookings:
+    build: ./apps/nexora-bookings
+    ports:
+      - "5000:5000"
+    environment:
+      - DEMO_MODE=${DEMO_MODE:-true}
+    volumes:
+      - ./apps/nexora-bookings:/app
+
+  nexora-routeiq:
+    build: ./apps/nexora-routeiq
+    ports:
+      - "5050:5050"
+    environment:
+      - DEMO_MODE=${DEMO_MODE:-true}
+    volumes:
+      - ./apps/nexora-routeiq:/app
