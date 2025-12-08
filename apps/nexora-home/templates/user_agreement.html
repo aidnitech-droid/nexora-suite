@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-8">
+      <h1 class="mb-4">User Agreement</h1>
+      <p class="text-muted"><strong>Last Updated:</strong> December 8, 2025 | <strong>Effective Date:</strong> January 1, 2026</p>
+
+      <nav class="mb-5">
+        <div class="list-group">
+          <a href="#section-1" class="list-group-item list-group-item-action">1. User Categories</a>
+          <a href="#section-2" class="list-group-item list-group-item-action">2. Individual User Rights & Obligations</a>
+          <a href="#section-3" class="list-group-item list-group-item-action">3. Organization Admin Rights</a>
+          <a href="#section-4" class="list-group-item list-group-item-action">4. Account Usage Policies</a>
+          <a href="#section-5" class="list-group-item list-group-item-action">5. Data Management</a>
+          <a href="#section-6" class="list-group-item list-group-item-action">6. Support & SLA</a>
+          <a href="#section-7" class="list-group-item list-group-item-action">7. Acceptable Use Policy</a>
+          <a href="#section-8" class="list-group-item list-group-item-action">8. Penalties & Enforcement</a>
+        </div>
+      </nav>
+
+      <section id="section-1" class="mb-5">
+        <h2>1. User Categories</h2>
+        <h5>A. Individual/Free User:</h5>
+        <ul>
+          <li>No credit card required</li>
+          <li>Limited to 3 team members</li>
+          <li>Access to basic modules</li>
+          <li>Community support only</li>
+          <li>Subject to data retention of 90 days post-cancellation</li>
+        </ul>
+
+        <h5>B. Professional/Paid Subscriber:</h5>
+        <ul>
+          <li>Unlimited team members</li>
+          <li>Access to all 25+ modules</li>
+          <li>Priority email support (24 hours)</li>
+          <li>API access included</li>
+          <li>Data retention: 30 days post-cancellation</li>
+        </ul>
+
+        <h5>C. Enterprise User:</h5>
+        <ul>
+          <li>Custom configuration and deployment</li>
+          <li>Dedicated account manager</li>
+          <li>SLA guarantee (99.9% uptime)</li>
+          <li>Phone + email support 24/7</li>
+          <li>Custom data retention agreements</li>
+        </ul>
+      </section>
+
+      <section id="section-2" class="mb-5">
+        <h2>2. Individual User Rights & Obligations</h2>
+        <h5>A. Your Rights:</h5>
+        <ul>
+          <li>Right to create one personal account</li>
+          <li>Right to access features included in your subscription tier</li>
+          <li>Right to export your personal data</li>
+          <li>Right to delete your account</li>
+          <li>Right to report abuse or security issues</li>
+          <li>Right to file a data subject request (GDPR/CCPA)</li>
+        </ul>
+
+        <h5>B. Your Obligations:</h5>
+        <ul>
+          <li>Provide accurate, truthful information during registration</li>
+          <li>Keep your password confidential and secure</li>
+          <li>Notify us immediately of unauthorized access</li>
+          <li>Use only for legitimate business purposes</li>
+          <li>Not share your account with others</li>
+          <li>Comply with all applicable laws</li>
+          <li>Not engage in harassment or abusive behavior</li>
+        </ul>
+      </section>
+
+      <section id="section-3" class="mb-5">
+        <h2>3. Organization Admin Rights</h2>
+        <h5>A. Admin Permissions:</h5>
+        <ul>
+          <li>Manage team member invitations and roles</li>
+          <li>Access all data within your organization</li>
+          <li>Configure organization settings and modules</li>
+          <li>View and manage billing</li>
+          <li>Request data exports for your organization</li>
+          <li>Delete the organization and data</li>
+        </ul>
+
+        <h5>B. Admin Responsibilities:</h5>
+        <ul>
+          <li>Ensure all team members comply with this agreement</li>
+          <li>Monitor and control access to sensitive data</li>
+          <li>Implement data governance policies</li>
+          <li>Maintain backup copies of critical data</li>
+          <li>Report security issues immediately</li>
+        </ul>
+
+        <h5>C. Sub-Admin Limitations:</h5>
+        <ul>
+          <li>Sub-admins have limited permissions as configured by the main admin</li>
+          <li>They cannot create new admins or delete the organization</li>
+          <li>They cannot change billing information</li>
+        </ul>
+      </section>
+
+      <section id="section-4" class="mb-5">
+        <h2>4. Account Usage Policies</h2>
+        <h5>A. Account Sharing:</h5>
+        <ul>
+          <li>One user per login credential</li>
+          <li>Do not share credentials with other individuals</li>
+          <li>Inviting team members creates individual accounts for each person</li>
+          <li>Account sharing violates terms and may result in suspension</li>
+        </ul>
+
+        <h5>B. Multi-Tenancy & Organization Limits:</h5>
+        <ul>
+          <li>Each organization is isolated and secure</li>
+          <li>One login email per user account</li>
+          <li>You may belong to multiple organizations (separate accounts recommended)</li>
+          <li>Organizations cannot be transferred to other users</li>
+        </ul>
+
+        <h5>C. Testing & Sandbox Accounts:</h5>
+        <ul>
+          <li>Demo/sandbox accounts are for testing only</li>
+          <li>Do not use test data in production</li>
+          <li>Test accounts may be purged without notice</li>
+          <li>Demo mode blocks delete operations (for safety)</li>
+        </ul>
+      </section>
+
+      <section id="section-5" class="mb-5">
+        <h2>5. Data Management</h2>
+        <h5>A. Data Ownership:</h5>
+        <ul>
+          <li>You retain 100% ownership of your business data</li>
+          <li>We do not claim any rights to your data</li>
+          <li>You may export data anytime in CSV or JSON format</li>
+          <li>We recommend maintaining your own backups</li>
+        </ul>
+
+        <h5>B. Data Retention:</h5>
+        <ul>
+          <li><strong>During Active Subscription:</strong> Data stored indefinitely</li>
+          <li><strong>After Cancellation:</strong> Free users 90 days, Paid users 30 days</li>
+          <li><strong>Data Export Window:</strong> 7 days after cancellation</li>
+          <li><strong>Permanent Deletion:</strong> After retention period ends</li>
+        </ul>
+
+        <h5>C. Data Backup & Recovery:</h5>
+        <ul>
+          <li>We maintain encrypted daily backups</li>
+          <li>Backups are stored across multiple geographic regions</li>
+          <li>Recovery requests honored within 48 hours</li>
+          <li>For Enterprise: guaranteed 99.99% backup success rate</li>
+        </ul>
+
+        <h5>D. Data Restrictions:</h5>
+        <ul>
+          <li>Do not store sensitive personal data (SSN, passwords, credit cards directly)</li>
+          <li>Do not store data for illegal purposes</li>
+          <li>Do not upload malware or exploit code</li>
+          <li>We reserve the right to delete prohibited content</li>
+        </ul>
+      </section>
+
+      <section id="section-6" class="mb-5">
+        <h2>6. Support & Service Level Agreement</h2>
+        <h5>A. Support Tiers:</h5>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Tier</th>
+                <th>Response Time</th>
+                <th>Support Channel</th>
+                <th>Availability</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Free</strong></td>
+                <td>72 hours</td>
+                <td>Community forum</td>
+                <td>Business hours (EST)</td>
+              </tr>
+              <tr>
+                <td><strong>Professional</strong></td>
+                <td>24 hours</td>
+                <td>Email, Chat</td>
+                <td>24/7</td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise</strong></td>
+                <td>1 hour (Critical)</td>
+                <td>Phone, Email, Chat, Slack</td>
+                <td>24/7</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h5>B. SLA Guarantees (Enterprise only):</h5>
+        <ul>
+          <li>99.9% uptime guarantee</li>
+          <li>Service credits for downtime exceeding threshold</li>
+          <li>Quarterly business reviews</li>
+          <li>Dedicated account manager</li>
+        </ul>
+
+        <h5>C. Support Exclusions:</h5>
+        <p>Support does not include:</p>
+        <ul>
+          <li>Custom feature development</li>
+          <li>Data recovery from user error (if backups available)</li>
+          <li>Training or consulting services (available as add-on)</li>
+        </ul>
+      </section>
+
+      <section id="section-7" class="mb-5">
+        <h2>7. Acceptable Use Policy</h2>
+        <h5>A. Prohibited Activities:</h5>
+        <p><strong>You will NOT:</strong></p>
+        <ul>
+          <li>Use Nexora for illegal activities or violate laws</li>
+          <li>Attempt unauthorized access or hacking</li>
+          <li>Deploy malware, viruses, or exploits</li>
+          <li>Scrape data or use automated bots without permission</li>
+          <li>Harass, threaten, or abuse other users</li>
+          <li>Spam or send unsolicited communications</li>
+          <li>Compete with Nexora using our platform</li>
+          <li>Reverse engineer or decompile our software</li>
+        </ul>
+
+        <h5>B. Content Standards:</h5>
+        <ul>
+          <li>All business data must comply with applicable laws</li>
+          <li>No hate speech, obscenity, or discriminatory content</li>
+          <li>No child abuse, exploitation, or CSAM content</li>
+          <li>No copyright or trademark infringement</li>
+          <li>No fraudulent or deceptive content</li>
+        </ul>
+
+        <h5>C. Performance Standards:</h5>
+        <ul>
+          <li>Do not consume excessive bandwidth or CPU resources</li>
+          <li>Do not make excessive API calls beyond your tier limits</li>
+          <li>Do not overload our infrastructure with spam</li>
+        </ul>
+      </section>
+
+      <section id="section-8" class="mb-5">
+        <h2>8. Penalties & Enforcement</h2>
+        <h5>A. Warning:</h5>
+        <ul>
+          <li>First violation may result in a written warning</li>
+          <li>You have 7 days to cure the violation</li>
+          <li>Failure to cure may result in suspension</li>
+        </ul>
+
+        <h5>B. Suspension:</h5>
+        <ul>
+          <li>Accounts may be suspended for serious violations</li>
+          <li>We will provide notice and reason (except emergency cases)</li>
+          <li>You can appeal within 14 days</li>
+          <li>Suspended data is retained for 30 days</li>
+        </ul>
+
+        <h5>C. Termination:</h5>
+        <ul>
+          <li>Accounts may be terminated for repeated violations or illegal activity</li>
+          <li>Data is deleted per retention policy</li>
+          <li>No refunds issued for terminated accounts</li>
+          <li>You may appeal termination decisions</li>
+        </ul>
+
+        <h5>D. Appeal Process:</h5>
+        <ol>
+          <li>Send appeal request to support@aidniglobal.in within 14 days</li>
+          <li>Provide context and explanation of your position</li>
+          <li>Our team will review and respond within 7 business days</li>
+          <li>We reserve the right to make final decisions</li>
+        </ol>
+      </section>
+
+      <hr class="my-5">
+      <p class="text-muted small">This User Agreement is supplementary to our Terms of Service and Privacy Policy. All documents taken together constitute the complete agreement.</p>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top: 20px;">
+        <div class="card-header bg-light">
+          <h6 class="mb-0">Policy Docs</h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="{{ url_for('privacy_policy') }}">Privacy Policy</a></li>
+            <li class="mb-2"><a href="{{ url_for('terms_of_service') }}">Terms of Service</a></li>
+            <li class="mb-2"><a href="{{ url_for('dpa') }}">Data Processing Agreement</a></li>
+            <li><a href="{{ url_for('about') }}">About Nexora</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -226,6 +226,32 @@ def api_modules():
     return jsonify({'modules': modules})
 
 
+# Legal & Compliance Pages
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
+@app.route('/privacy-policy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
+
+@app.route('/terms-of-service')
+def terms_of_service():
+    return render_template('terms_of_service.html')
+
+
+@app.route('/user-agreement')
+def user_agreement():
+    return render_template('user_agreement.html')
+
+
+@app.route('/data-processing-agreement')
+def dpa():
+    return render_template('dpa.html')
+
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', '5060'))
     app.run(host='0.0.0.0', port=port)
