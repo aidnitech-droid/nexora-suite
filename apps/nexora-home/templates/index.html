@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="text-center">
+    <h1 class="display-6">Welcome to Nexora Suite Home</h1>
+    <p class="lead">A unified dashboard linking all Nexora modules and admin tools.</p>
+    {% if user %}
+      <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+    {% else %}
+      <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}">Sign In</a>
+      <a class="btn btn-outline-primary btn-lg" href="{{ url_for('register') }}">Create Account</a>
+    {% endif %}
+  </div>
+{% endblock %}

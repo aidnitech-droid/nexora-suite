@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2>Dashboard</h2>
+      <div class="text-muted">Welcome back, {{ user.username }} — role: {{ user.role }}</div>
+    </div>
+    <div>
+      <a class="btn btn-outline-secondary" href="{{ url_for('logout') }}">Sign out</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Modules</h5>
+          <div class="row row-cols-1 row-cols-md-2 g-3">
+            {% for m in modules %}
+            <div class="col">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="card-title">{{ m.name }}</h6>
+                  <p class="card-text text-truncate">{{ m.readme or 'No description available' }}</p>
+                  <a href="{{ url_for('module_detail', module_name=m.name) }}" class="btn btn-sm btn-primary">Open</a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Quick Links</h5>
+          <ul class="list-unstyled mb-0">
+            <li><a href="/apps/nexora-routeiq">RouteIQ</a></li>
+            <li><a href="/apps/nexora-bookings">Bookings</a></li>
+            <li><a href="/apps/nexora-books">Books</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Account</h5>
+          <p class="mb-0">Member since {{ user.created_at.date() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

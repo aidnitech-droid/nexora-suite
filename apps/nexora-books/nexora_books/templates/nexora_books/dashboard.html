@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Nexora Books - Dashboard</title>
+  </head>
+  <body>
+    <h1>Nexora Books Dashboard</h1>
+    <h2>Ledgers</h2>
+    <ul>
+      {% for ledger in ledgers %}
+        <li>{{ ledger.name }} - {{ ledger.description }}</li>
+      {% else %}
+        <li>No ledgers found</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Accounts (sample)</h2>
+    <ul>
+      {% for a in accounts %}
+        <li>{{ a.name }} ({{ a.account_type }}) - Balance: {{ a.balance }}</li>
+      {% else %}
+        <li>No accounts</li>
+      {% endfor %}
+    </ul>
+
+    <p><a href="/books/add-entry">Add Journal Entry</a> | <a href="/books/ledgers">View Ledgers</a></p>
+  </body>
+</html>

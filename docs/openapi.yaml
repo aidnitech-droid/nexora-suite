@@ -1,0 +1,396 @@
+openapi: 3.0.3
+info:
+  title: Nexora Suite API
+  version: "1.0.0"
+  description: |
+    Consolidated OpenAPI specification for the Nexora micro-apps (bookings, routeiq, home, etc.).
+servers:
+  - url: http://localhost:5000
+    description: Local development server (adjust as needed)
+
+paths:
+  /api/health:
+    get:
+      summary: Service health check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      responses:
+        '201':
+          description: User created
+        '400':
+          description: Bad request
+
+  /api/auth/login:
+    post:
+      summary: Login and receive access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+
+  /api/bookings/modules:
+    get:
+      summary: List booking modules
+      responses:
+        '200':
+          description: List of modules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Module'
+    post:
+      summary: Create a module
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleCreate'
+      responses:
+        '201':
+          description: Module created
+
+  /api/bookings/modules/{module_id}:
+    parameters:
+      - name: module_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get module
+      responses:
+        '200':
+          description: Module details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+    put:
+      summary: Update module
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleCreate'
+      responses:
+        '200':
+          description: Module updated
+    delete:
+      summary: Delete module
+      responses:
+        '200':
+          description: Module deleted
+
+  /api/bookings/calendars:
+    get:
+      summary: List calendars
+      responses:
+        '200':
+          description: Calendars list
+    post:
+      summary: Create a calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarCreate'
+      responses:
+        '201':
+          description: Calendar created
+
+  /api/bookings/calendars/{cal_id}:
+    parameters:
+      - name: cal_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get a calendar
+      responses:
+        '200':
+          description: Calendar details
+
+  /api/bookings/calendars/{cal_id}/time-slots:
+    post:
+      summary: Create a time slot for a calendar
+      parameters:
+        - name: cal_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSlotCreate'
+      responses:
+        '201':
+          description: Time slot created
+    get:
+      summary: List time slots for a calendar
+      responses:
+        '200':
+          description: Time slots list
+
+  /api/bookings/time-slots/{slot_id}:
+    parameters:
+      - name: slot_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      summary: Update a time slot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_available:
+                  type: boolean
+      responses:
+        '200':
+          description: Time slot updated
+
+  /api/bookings/appointments:
+    get:
+      summary: List appointments (optional filters)
+      parameters:
+        - name: calendar_id
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Appointments list
+    post:
+      summary: Create an appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentCreate'
+      responses:
+        '201':
+          description: Appointment created
+
+  /api/bookings/appointments/{apt_id}:
+    parameters:
+      - name: apt_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get appointment
+    put:
+      summary: Update appointment
+    delete:
+      summary: Delete appointment
+
+  /api/bookings/calendars/{cal_id}/availability:
+    get:
+      summary: Check availability for a calendar
+      parameters:
+        - name: cal_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Availability information
+
+  /api/routeiq/plan:
+    post:
+      summary: Plan a route (mock ORS)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutePlanRequest'
+      responses:
+        '200':
+          description: Route plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutePlanResponse'
+
+  /api/routeiq/health:
+    get:
+      summary: RouteIQ health
+      responses:
+        '200':
+          description: ok
+
+  /api/nexora-home/modules:
+    get:
+      summary: List discovered modules (requires session)
+      responses:
+        '200':
+          description: List of modules
+
+components:
+  schemas:
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+    UserRegister:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    UserLogin:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Module:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+    ModuleCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+    CalendarCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        timezone:
+          type: string
+        description:
+          type: string
+    TimeSlotCreate:
+      type: object
+      required: [day_of_week, start_time, end_time]
+      properties:
+        day_of_week:
+          type: integer
+        start_time:
+          type: string
+        end_time:
+          type: string
+        is_available:
+          type: boolean
+    AppointmentCreate:
+      type: object
+      required: [calendar_id, title, start_time, end_time]
+      properties:
+        calendar_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        start_time:
+          type: string
+        end_time:
+          type: string
+        client_name:
+          type: string
+        client_email:
+          type: string
+        client_phone:
+          type: string
+    RoutePlanRequest:
+      type: object
+      required: [origin, destination]
+      properties:
+        origin:
+          type: array
+          items:
+            type: number
+        destination:
+          type: array
+          items:
+            type: number
+        waypoints:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+        profile:
+          type: string
+    RoutePlanResponse:
+      type: object
+      properties:
+        route:
+          type: object
+          properties:
+            geometry:
+              type: object
+            distance_km:
+              type: number
+            duration_min:
+              type: number
