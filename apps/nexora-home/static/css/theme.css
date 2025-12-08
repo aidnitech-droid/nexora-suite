@@ -1,14 +1,14 @@
 :root{
-  --nexora-primary: #1f7a73; /* deep teal */
-  --nexora-accent: #4caf50; /* green accent */
-  --nexora-dark: #123f3d;
-  --nexora-light: #eaf7f6;
+  --nexora-primary: #0066cc; /* light blue */
+  --nexora-accent: #0099ff; /* bright blue accent */
+  --nexora-dark: #003d7a;
+  --nexora-light: #e6f2ff;
   --nexora-contrast: #ffffff;
 }
 
 /* Navbar */
 .navbar.bg-primary{
-  background: linear-gradient(90deg,var(--nexora-primary), #2b8f86) !important;
+  background: linear-gradient(90deg, #0066cc, #0099ff) !important;
 }
 .navbar .navbar-brand .nexora-logo{
   height: 36px;
@@ -24,15 +24,15 @@
 
 /* Buttons */
 .btn-primary{
-  background: linear-gradient(180deg,var(--nexora-accent), #3da64a);
+  background: linear-gradient(180deg, #0099ff, #0066cc);
   border: none;
 }
 
 /* Pricing banner */
 .pricing-banner{
-  background: linear-gradient(90deg, rgba(79, 195, 140, 0.12), rgba(31,122,115,0.08));
-  border: 1px solid rgba(76,175,80,0.12);
-  color: var(--nexora-dark);
+  background: linear-gradient(90deg, rgba(0, 153, 255, 0.12), rgba(0, 102, 204, 0.08));
+  border: 1px solid rgba(0, 153, 255, 0.12);
+  color: #003d7a;
 }
 
 /* Demo banner */
@@ -44,12 +44,12 @@
 /* Card accents */
 .card {
   border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(13, 40, 38, 0.06);
+  box-shadow: 0 6px 18px rgba(0, 102, 204, 0.08);
 }
 
 /* Hero / CTA */
 .hero-cta{
-  background: linear-gradient(135deg, var(--nexora-primary), var(--nexora-accent));
+  background: linear-gradient(135deg, #0066cc, #0099ff);
   color: white;
   border-radius: 12px;
   padding: 24px;
@@ -66,10 +66,27 @@
 
 /* Footer theme (if present) */
 .site-footer{
-  background: linear-gradient(180deg, #0f3b38, #0b2d2a);
-  color: #dfeff0;
+  background: linear-gradient(180deg, #0052a3, #003d7a);
+  color: #e6f2ff;
   padding: 30px 0;
 }
 
 .site-footer p{margin-bottom:0}
-.site-footer .footer-link{color:#dff7f5; text-decoration:underline}
+.site-footer .footer-link{color:#cce5ff; text-decoration:underline}
+
+/* About page styles */
+.border-left-nexora {
+  border-left: 4px solid #0099ff !important;
+}
+
+.flex-center-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0099ff;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+}
