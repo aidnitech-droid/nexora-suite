@@ -1,8 +1,25 @@
 from flask import Flask, request, jsonify
 from math import radians, sin, cos, sqrt, atan2
 import os
+import sys
+
+# Add parent directory to path for imports
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+APPS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
+COMMON_DIR = os.path.abspath(os.path.join(APPS_DIR, '..', 'common'))
+sys.path.insert(0, COMMON_DIR)
+
+from utils.pricing_guard import (
+    get_pricing_status,
+    apply_pricing_middleware,
+    is_free_tier_active,
+)
 
 app = Flask(__name__)
+
+# Apply pricing middleware
+apply_pricing_middleware(app)
+
 DEMO_MODE = os.getenv('DEMO_MODE', '0').lower() in ('1', 'true', 'yes')
 
 

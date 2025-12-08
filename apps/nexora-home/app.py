@@ -4,9 +4,22 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import os
 from datetime import datetime
+import sys
 
+# Add parent directory to path for imports
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APPS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))  # parent apps/ directory
+COMMON_DIR = os.path.abspath(os.path.join(APPS_DIR, '..', 'common'))
+sys.path.insert(0, COMMON_DIR)
+
+from utils.pricing_guard import (
+    get_pricing_status,
+    get_banner_data,
+    apply_pricing_middleware,
+    pricing_guard,
+    is_free_tier_active,
+)
+
 DEMO_MODE = os.getenv('DEMO_MODE', '0').lower() in ('1', 'true', 'yes')
 
 DEMO_CREDENTIALS = {
@@ -22,6 +35,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('NEXORA_HOME_SECRET', 'dev-secret')
 
 db = SQLAlchemy(app)
+
+# Apply pricing middleware to add headers to all responses
+apply_pricing_middleware(app)
 
 # Initialization flag to ensure db.create_all() runs only once
 _initialized = False
@@ -88,7 +104,12 @@ def initialize_and_block_deletes():
 
 @app.context_processor
 def inject_demo_flag():
-    return {'demo_mode': DEMO_MODE}
+    return {
+        'demo_mode': DEMO_MODE,
+        'pricing_status': get_pricing_status(),
+        'banner_data': get_banner_data(),
+        'free_tier_active': is_free_tier_active(),
+    }
 
 
 @app.route('/')

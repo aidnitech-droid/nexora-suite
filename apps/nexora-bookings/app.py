@@ -6,6 +6,20 @@ import os
 from datetime import timedelta, datetime
 import uuid
 import json
+import sys
+
+# Add parent directory to path for imports
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+APPS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
+COMMON_DIR = os.path.abspath(os.path.join(APPS_DIR, '..', 'common'))
+sys.path.insert(0, COMMON_DIR)
+
+from utils.pricing_guard import (
+    get_pricing_status,
+    apply_pricing_middleware,
+    pricing_guard,
+    is_free_tier_active,
+)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -19,6 +33,10 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 # Initialize extensions
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
+
+# Apply pricing middleware
+apply_pricing_middleware(app)
+
 DEMO_MODE = os.getenv('DEMO_MODE', '0').lower() in ('1', 'true', 'yes')
 DEMO_CREDENTIALS = {
     'email': 'demo@nexora.com',
