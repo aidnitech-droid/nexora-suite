@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import ast
 import os
 from datetime import datetime
 import sys
@@ -169,19 +170,34 @@ def dashboard():
     apps_root = APPS_DIR
     modules = []
     try:
+        def get_module_description(path):
+            # Try README files first
+            for fname in ('README.md', 'README.MD', 'README', 'README.txt'):
+                fpath = os.path.join(path, fname)
+                if os.path.exists(fpath):
+                    try:
+                        with open(fpath, 'r', encoding='utf-8') as fh:
+                            return fh.read()
+                    except Exception:
+                        break
+            # Fallback: try to extract top-level docstring from app.py or __init__.py
+            for candidate in ('app.py', '__init__.py'):
+                fpath = os.path.join(path, candidate)
+                if os.path.exists(fpath):
+                    try:
+                        src = open(fpath, 'r', encoding='utf-8').read()
+                        module = ast.parse(src)
+                        doc = ast.get_docstring(module)
+                        if doc:
+                            return doc
+                    except Exception:
+                        pass
+            return None
+
         for name in sorted(os.listdir(apps_root)):
             path = os.path.join(apps_root, name)
             if os.path.isdir(path):
-                readme = None
-                for fname in ('README.md', 'README.MD', 'README'):
-                    fpath = os.path.join(path, fname)
-                    if os.path.exists(fpath):
-                        try:
-                            with open(fpath, 'r', encoding='utf-8') as fh:
-                                readme = fh.read()
-                        except Exception:
-                            readme = None
-                        break
+                readme = get_module_description(path)
                 modules.append({'name': name, 'path': path, 'readme': readme})
     except Exception:
         modules = []
@@ -195,21 +211,49 @@ def module_detail(module_name):
     path = os.path.join(apps_root, module_name)
     if not os.path.isdir(path):
         return "Not found", 404
-    readme = None
-    for fname in ('README.md', 'README.MD', 'README'):
-        fpath = os.path.join(path, fname)
+    # Try to obtain a descriptive README or docstring
+    def get_module_description(path):
+        for fname in ('README.md', 'README.MD', 'README', 'README.txt'):
+            fpath = os.path.join(path, fname)
+            if os.path.exists(fpath):
+                try:
+                    with open(fpath, 'r', encoding='utf-8') as fh:
+                        return fh.read()
+                except Exception:
+                    break
+        for candidate in ('app.py', '__init__.py'):
+            fpath = os.path.join(path, candidate)
+            if os.path.exists(fpath):
+                try:
+                    src = open(fpath, 'r', encoding='utf-8').read()
+                    module = ast.parse(src)
+                    doc = ast.get_docstring(module)
+                    if doc:
+                        return doc
+                except Exception:
+                    pass
+        return None
+
+    readme = get_module_description(path)
+
+    # Try to detect a health endpoint in source files
+    suggested_health = None
+    for candidate in ('app.py',):
+        fpath = os.path.join(path, candidate)
         if os.path.exists(fpath):
             try:
-                with open(fpath, 'r', encoding='utf-8') as fh:
-                    readme = fh.read()
+                text = open(fpath, 'r', encoding='utf-8').read()
+                if '/api/health' in text or 'def health' in text:
+                    suggested_health = f'http://localhost:5000/{module_name}/api/health'
+                    break
             except Exception:
-                readme = None
-            break
+                pass
+
     info = {
         'name': module_name,
         'path': path,
         'readme': readme,
-        'suggested_health_url': f'http://localhost:5000/{module_name}/api/health'
+        'suggested_health_url': suggested_health
     }
     return render_template('module.html', module=info)
 
