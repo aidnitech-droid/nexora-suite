@@ -21,21 +21,21 @@ def test_health_endpoint(client):
     assert response.status_code == 200
 
 def test_create_technician(client):
-    response = client.post('/api/technicians', 
+    response = client.post('/api/service/technicians', 
         json={'name': 'John Doe', 'email': 'john@example.com', 'phone': '555-1234', 'skills': 'Electrical,Plumbing'})
     assert response.status_code in [200, 201, 400]
 
 def test_list_technicians(client):
-    response = client.get('/api/technicians')
+    response = client.get('/api/service/technicians')
     assert response.status_code == 200
 
 def test_create_job_ticket(client):
-    response = client.post('/api/job-tickets',
+    response = client.post('/api/service/jobs',
         json={'title': 'AC Repair', 'description': 'Fix AC unit', 'customer_name': 'Jane Doe', 'priority': 'high'})
     assert response.status_code in [200, 201, 400]
 
 def test_list_job_tickets(client):
-    response = client.get('/api/job-tickets')
+    response = client.get('/api/service/jobs')
     assert response.status_code == 200
 
 if __name__ == '__main__':

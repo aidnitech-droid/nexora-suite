@@ -368,12 +368,13 @@ def test_delete_blocked_in_demo_mode(client):
     apt_id = apt_response.json['id']
 
     # enable demo mode at runtime and attempt delete
-    original = app.DEMO_MODE
-    app.DEMO_MODE = True
+    import app as app_module
+    original = app_module.DEMO_MODE
+    app_module.DEMO_MODE = True
     try:
         r = client.delete(f'/api/bookings/appointments/{apt_id}')
         assert r.status_code == 403
         assert 'delete disabled' in r.json.get('error', '').lower()
     finally:
-        app.DEMO_MODE = original
+        app_module.DEMO_MODE = original
 

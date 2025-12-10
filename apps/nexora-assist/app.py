@@ -222,13 +222,13 @@ class SupportRequest(db.Model):
     status = db.Column(db.String(50), default='open')  # open, in_progress, resolved, closed
     assigned_to = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     preferred_time = db.Column(db.DateTime, nullable=True)
-    metadata = db.Column(db.Text)  # JSON blob for extra info
+    meta_info = db.Column(db.Text)  # JSON blob for extra info
     created_at = db.Column(db.DateTime, default=db.func.now())
 
     def to_dict(self):
         meta = None
         try:
-            meta = json.loads(self.metadata) if self.metadata else None
+            meta = json.loads(self.meta_info) if self.meta_info else None
         except Exception:
             meta = None
         return {
@@ -255,14 +255,14 @@ class SessionLog(db.Model):
     actor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     entry_type = db.Column(db.String(50), default='note')  # note, system, event
     message = db.Column(db.Text)
-    metadata = db.Column(db.Text)
+    meta_info = db.Column(db.Text)
 
     request = db.relationship('SupportRequest', backref=db.backref('session_logs', lazy=True))
 
     def to_dict(self):
         meta = None
         try:
-            meta = json.loads(self.metadata) if self.metadata else None
+            meta = json.loads(self.meta_info) if self.meta_info else None
         except Exception:
             meta = None
         return {
