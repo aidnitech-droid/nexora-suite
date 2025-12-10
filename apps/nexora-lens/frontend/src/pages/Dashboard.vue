@@ -1,90 +1,80 @@
 <template>
-  <div class="container">
-    <Sidebar />
-    <main class="main-content">
-      <div class="dashboard-header">
-        <h1>Dashboard</h1>
-        <button @click="logout" class="btn-logout">Logout</button>
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h1>Nexora Module Dashboard</h1>
+      <p>Welcome to your module</p>
+    </div>
+
+    <div class="welcome-section">
+      <div class="welcome-card">
+        <h2>Getting Started</h2>
+        <p>This is your module dashboard. Start by exploring the features available.</p>
+        <ul>
+          <li>📊 View your data and statistics</li>
+          <li>➕ Create and manage items</li>
+          <li>⚙️ Configure settings</li>
+          <li>📈 Track performance</li>
+        </ul>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Total Items</h3>
-          <p class="stat-number">{{ stats.totalItems }}</p>
-        </div>
-      </div>
-    </main>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import Sidebar from '../components/Sidebar.vue'
-import { itemService } from '../services/itemService'
-
-const router = useRouter()
-const stats = ref({ totalItems: 0 })
-
-onMounted(async () => {
-  try {
-    const response = await itemService.getItems(1, 1000)
-    stats.value.totalItems = response.data.items.length
-  } catch (error) {
-    console.error('Failed to load stats:', error)
-  }
-})
-
-const logout = () => {
-  localStorage.removeItem('token')
-  router.push('/login')
-}
+<script>
+export default {
+  name: 'Dashboard'
+};
 </script>
 
 <style scoped>
-.container {
-  display: flex;
-  height: 100vh;
-  background: #f5f5f5;
-}
-
-.main-content {
-  flex: 1;
-  overflow-y: auto;
+.dashboard {
   padding: 20px;
 }
 
 .dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 30px;
 }
 
-.btn-logout {
-  padding: 8px 16px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.dashboard-header h1 {
+  font-size: 28px;
+  color: #333;
+  margin: 0 0 5px 0;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+.dashboard-header p {
+  color: #666;
+  margin: 0;
 }
 
-.stat-card {
+.welcome-section {
+  margin-bottom: 30px;
+}
+
+.welcome-card {
   background: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.stat-number {
-  font-size: 32px;
-  font-weight: bold;
-  color: #667eea;
+.welcome-card h2 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.welcome-card p {
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.welcome-card ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.welcome-card li {
+  margin: 8px 0;
+  color: #666;
 }
 </style>

@@ -1,27 +1,27 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../pages/Login.vue'
-import Dashboard from '../pages/Dashboard.vue'
-import Items from '../pages/Items.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import Dashboard from '../pages/Dashboard.vue';
+
+Vue.use(VueRouter);
 
 const routes = [
-  { path: '/', redirect: '/dashboard' },
-  { path: '/login', name: 'Login', component: Login },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
-  { path: '/items', name: 'Items', component: Items, meta: { requiresAuth: true } }
-]
+  {
+    path: '/',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: { title: 'Dashboard' }
+  }
+];
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
   routes
-})
+});
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) {
-    next('/login')
-  } else {
-    next()
-  }
-})
+  document.title = to.meta.title || 'Nexora';
+  next();
+});
 
-export default router
+export default router;
