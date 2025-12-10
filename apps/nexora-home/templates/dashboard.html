@@ -21,8 +21,16 @@
               <div class="card h-100">
                 <div class="card-body">
                   <h6 class="card-title">{{ m.name }}</h6>
-                  <p class="card-text text-truncate">{{ m.readme or 'No description available' }}</p>
-                  <a href="{{ url_for('module_detail', module_name=m.name) }}" class="btn btn-sm btn-primary">Open</a>
+                  <p class="card-text text-truncate">{{ (m.readme[:180] ~ '...') if (m.readme and m.readme|length > 180) else (m.readme or 'No description available') }}</p>
+                  <div class="d-flex gap-2">
+                    <a href="{{ url_for('module_detail', module_name=m.name) }}" class="btn btn-sm btn-primary">Open</a>
+                    {% if m.suggested_health %}
+                      <a href="{{ m.suggested_health }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success">Health</a>
+                    {% else %}
+                      <button class="btn btn-sm btn-outline-secondary" disabled>No health</button>
+                    {% endif %}
+                  </div>
+                  <div class="mt-2"><small class="text-muted">Path: <code>apps/{{ m.name }}</code></small></div>
                 </div>
               </div>
             </div>

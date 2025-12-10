@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import ast
+import json
 import os
 from datetime import datetime
 import sys
@@ -180,6 +181,17 @@ def dashboard():
                             return fh.read()
                     except Exception:
                         break
+            # Next, try package.json in frontend or module root for a description
+            for pkg_loc in (os.path.join(path, 'frontend', 'package.json'), os.path.join(path, 'package.json')):
+                if os.path.exists(pkg_loc):
+                    try:
+                        with open(pkg_loc, 'r', encoding='utf-8') as fh:
+                            pj = json.load(fh)
+                            desc = pj.get('description')
+                            if desc:
+                                return desc
+                    except Exception:
+                        pass
             # Fallback: try to extract top-level docstring from app.py or __init__.py
             for candidate in ('app.py', '__init__.py'):
                 fpath = os.path.join(path, candidate)
@@ -198,7 +210,20 @@ def dashboard():
             path = os.path.join(apps_root, name)
             if os.path.isdir(path):
                 readme = get_module_description(path)
-                modules.append({'name': name, 'path': path, 'readme': readme})
+                # detect health endpoint suggestion
+                suggested_health = None
+                for candidate in ('app.py',):
+                    fpath = os.path.join(path, candidate)
+                    if os.path.exists(fpath):
+                        try:
+                            text = open(fpath, 'r', encoding='utf-8').read()
+                            if '/api/health' in text or 'def health' in text:
+                                host = request.host_url.rstrip('/')
+                                suggested_health = f"{host}/{name}/api/health"
+                                break
+                        except Exception:
+                            pass
+                modules.append({'name': name, 'path': path, 'readme': readme, 'suggested_health': suggested_health})
     except Exception:
         modules = []
     return render_template('dashboard.html', user=user, modules=modules)
@@ -244,7 +269,10 @@ def module_detail(module_name):
             try:
                 text = open(fpath, 'r', encoding='utf-8').read()
                 if '/api/health' in text or 'def health' in text:
-                    suggested_health = f'http://localhost:5000/{module_name}/api/health'
+                    # Build a host-aware URL so this works on PythonAnywhere or other hosts
+                    host = request.host_url.rstrip('/')
+                    # If the host is localhost, keep http; otherwise use the provided scheme
+                    suggested_health = f"{host}/{module_name}/api/health"
                     break
             except Exception:
                 pass
