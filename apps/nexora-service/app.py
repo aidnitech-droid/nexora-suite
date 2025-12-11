@@ -80,6 +80,16 @@ def role_required(roles):
         return wrapper
     return decorator
 
+# ==================== Module Root ====================
+
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({
+        'module': 'nexora-service',
+        'status': 'running',
+        'endpoints': ['/api/auth/register', '/api/auth/login', '/api/services', '/api/health']
+    }), 200
+
 # Technicians endpoints
 @app.route('/api/service/technicians', methods=['GET'])
 def list_technicians():

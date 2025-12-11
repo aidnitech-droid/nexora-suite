@@ -104,6 +104,16 @@ def role_required(roles):
         return wrapper
     return decorator
 
+# ==================== Module Root ====================
+
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({
+        'module': 'nexora-bigin',
+        'status': 'running',
+        'endpoints': ['/api/auth/register', '/api/auth/login', '/api/items', '/api/health']
+    }), 200
+
 # ==================== Auth Endpoints ====================
 
 @app.route('/api/auth/register', methods=['POST'])

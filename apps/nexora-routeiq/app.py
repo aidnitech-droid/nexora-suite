@@ -87,6 +87,17 @@ class MockORSClient:
         }
 
 
+# ==================== Module Root ====================
+
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({
+        'module': 'nexora-routeiq',
+        'status': 'running',
+        'endpoints': ['/api/routeiq/plan', '/api/routeiq/health']
+    }), 200
+
+
 @app.route('/api/routeiq/plan', methods=['POST'])
 def plan():
     """Plan a route given origin, destination, optional waypoints and profile.
