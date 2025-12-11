@@ -14,6 +14,13 @@ APPS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))  # parent apps/ directo
 COMMON_DIR = os.path.abspath(os.path.join(APPS_DIR, '..', 'common'))
 sys.path.insert(0, COMMON_DIR)
 
+# Load environment variables from project .env (if present)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
 from utils.pricing_guard import (
     get_pricing_status,
     get_banner_data,
@@ -326,15 +333,43 @@ def register_module_routes():
             module_app = getattr(module, 'app', None)
             if not module_app:
                 continue
-            
+
+            # If the module has a frontend folder, serve its index.html at
+            # /module/<name>/ and static/assets under /module/<name>/static/ or /module/<name>/assets/
+            frontend_dir = os.path.join(str(module_dir), 'frontend')
+            served_frontend = False
+            if os.path.isdir(frontend_dir):
+                # Prefer a built 'dist' directory when present
+                dist_dir = os.path.join(frontend_dir, 'dist') if os.path.isdir(os.path.join(frontend_dir, 'dist')) else frontend_dir
+                index_html = os.path.join(dist_dir, 'index.html')
+                if os.path.exists(index_html):
+                    from flask import send_from_directory
+
+                    def make_index_handler(dpath):
+                        @login_required
+                        def index_handler():
+                            return send_from_directory(dpath, 'index.html')
+                        return index_handler
+
+                    app.add_url_rule(f"/module/{module_name}/", endpoint=f"{module_name}_frontend_index", view_func=make_index_handler(dist_dir), methods=['GET'])
+
+                    def make_static_handler(dpath):
+                        def static_handler(filename):
+                            return send_from_directory(dpath, filename)
+                        return static_handler
+
+                    app.add_url_rule(f"/module/{module_name}/static/<path:filename>", endpoint=f"{module_name}_frontend_static", view_func=make_static_handler(dist_dir), methods=['GET'])
+                    app.add_url_rule(f"/module/{module_name}/assets/<path:filename>", endpoint=f"{module_name}_frontend_assets", view_func=make_static_handler(dist_dir), methods=['GET'])
+                    served_frontend = True
+
             # Extract and register routes from module app
             for rule in list(module_app.url_map.iter_rules()):
                 if rule.endpoint in ('static', 'debug.static'):
                     continue
                 
-                # Skip root route as it returns JSON (we have our dashboard)
-                if rule.rule == '/':
-                    continue
+                # Include root route so module root is available at
+                # /module/<module_name>/ (map module's '/' to that path)
+                # (no longer skipping rule '/')
                 
                 # Create new route in main app with /module/<name> prefix
                 new_path = f"/module/{module_name}{rule.rule}"
@@ -346,8 +381,17 @@ def register_module_routes():
                 
                 # Register in main app
                 for method in rule.methods - {'HEAD', 'OPTIONS'}:
+                    # If the rule is root ('/'), and a frontend is being served,
+                    # skip registering the module's own '/' to avoid duplicate handlers.
+                    register_path = new_path
+                    if rule.rule == '/':
+                        register_path = f"/module/{module_name}/"
+                        if served_frontend:
+                            # frontend index will handle the root path
+                            continue
+
                     app.add_url_rule(
-                        new_path,
+                        register_path,
                         endpoint=f"{module_name}_{rule.endpoint}",
                         view_func=view_func,
                         methods=[method]
