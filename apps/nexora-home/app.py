@@ -275,6 +275,99 @@ def dpa():
     return render_template('dpa.html')
 
 
+# ==================== Module Integration ====================
+# Load and integrate all module routes as sub-features
+
+def register_module_routes():
+    """
+    Dynamically register routes from all modules.
+    
+    Each module (billing, crm, etc.) has API routes that are registered
+    under /module/<module-name>/ prefix.
+    
+    This allows all modules to run as part of the single home app while
+    maintaining separate code organization and independent updates.
+    """
+    import importlib.util
+    from pathlib import Path
+    
+    base_dir = os.path.dirname(__file__)
+    apps_dir = os.path.join(base_dir, '..')
+    
+    registered_count = 0
+    errors = []
+    
+    # Iterate through all module directories
+    for module_dir in sorted(Path(apps_dir).iterdir()):
+        if not module_dir.is_dir() or module_dir.name == 'nexora-home':
+            continue
+        
+        app_py_path = module_dir / 'app.py'
+        if not app_py_path.exists():
+            continue
+        
+        module_name = module_dir.name
+        
+        try:
+            # Load the module dynamically
+            spec = importlib.util.spec_from_file_location(
+                f"nexora_module_{module_name}",
+                str(app_py_path)
+            )
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            
+            # Get the Flask app from the module
+            module_app = getattr(module, 'app', None)
+            if not module_app:
+                continue
+            
+            # Extract and register routes from module app
+            for rule in list(module_app.url_map.iter_rules()):
+                if rule.endpoint in ('static', 'debug.static'):
+                    continue
+                
+                # Skip root route as it returns JSON (we have our dashboard)
+                if rule.rule == '/':
+                    continue
+                
+                # Create new route in main app with /module/<name> prefix
+                new_path = f"/module/{module_name}{rule.rule}"
+                
+                # Get the view function from module app
+                view_func = module_app.view_functions.get(rule.endpoint)
+                if not view_func:
+                    continue
+                
+                # Register in main app
+                for method in rule.methods - {'HEAD', 'OPTIONS'}:
+                    app.add_url_rule(
+                        new_path,
+                        endpoint=f"{module_name}_{rule.endpoint}",
+                        view_func=view_func,
+                        methods=[method]
+                    )
+                
+                registered_count += 1
+            
+        except Exception as e:
+            errors.append(f"Module {module_name}: {str(e)}")
+    
+    # Log results
+    if registered_count > 0:
+        print(f"✓ Registered {registered_count} routes from module apps")
+    if errors:
+        print(f"⚠ Integration warnings:")
+        for err in errors[:3]:  # Show first 3 errors
+            print(f"  - {err}")
+
+# Try to register module routes on app startup
+try:
+    register_module_routes()
+except Exception as e:
+    print(f"Warning: Module integration failed: {e}")
+
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', '5060'))
     app.run(host='0.0.0.0', port=port)
