@@ -1,28 +1,92 @@
-version: '3.8'
+version: '3.9'
+
 services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: nexora-db
+    environment:
+      POSTGRES_USER: nexora
+      POSTGRES_PASSWORD: nexora_secure_password_change_me
+      POSTGRES_DB: nexora_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - nexora-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexora"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for sessions/caching (optional but recommended)
+  redis:
+    image: redis:7-alpine
+    container_name: nexora-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - nexora-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nexora main application (unified)
   nexora-home:
-    build: ./apps/nexora-home
-    ports:
-      - "5060:5060"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexora-app
     environment:
-      - DEMO_MODE=${DEMO_MODE:-true}
+      DATABASE_URL: postgresql://nexora:nexora_secure_password_change_me@postgres:5432/nexora_production
+      NEXORA_HOME_SECRET: ${NEXORA_HOME_SECRET:-change-me-in-production}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      DEMO_MODE: ${DEMO_MODE:-0}
+      FLASK_ENV: production
+      PORT: 8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
     volumes:
-      - ./apps/nexora-home:/app
+      - ./apps:/app/apps:ro
+      - ./common:/app/common:ro
+      - nexora_instance:/app/instance
+    networks:
+      - nexora-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  nexora-bookings:
-    build: ./apps/nexora-bookings
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: nexora-proxy
     ports:
-      - "5000:5000"
-    environment:
-      - DEMO_MODE=${DEMO_MODE:-true}
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./apps/nexora-bookings:/app
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - nexora-home
+    networks:
+      - nexora-network
+    restart: unless-stopped
 
-  nexora-routeiq:
-    build: ./apps/nexora-routeiq
-    ports:
-      - "5050:5050"
-    environment:
-      - DEMO_MODE=${DEMO_MODE:-true}
-    volumes:
-      - ./apps/nexora-routeiq:/app
+volumes:
+  postgres_data:
+  nexora_instance:
+
+networks:
+  nexora-network:
+    driver: bridge

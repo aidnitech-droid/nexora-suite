@@ -1,0 +1,31 @@
+[Unit]
+Description=Nexora Suite - Unified Business Application Platform
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+User=nexora
+Group=nexora
+WorkingDirectory=/srv/nexora-suite
+Environment="PATH=/srv/nexora-suite/.venv/bin"
+Environment="DATABASE_URL=postgresql://nexora:secure_password@localhost:5432/nexora"
+Environment="NEXORA_HOME_SECRET=YOUR_SECURE_SECRET_KEY_HERE"
+Environment="JWT_SECRET=YOUR_JWT_SECRET_KEY_HERE"
+Environment="FLASK_ENV=production"
+Environment="DEMO_MODE=0"
+ExecStart=/srv/nexora-suite/.venv/bin/gunicorn \
+    --workers 4 \
+    --worker-class sync \
+    --bind 0.0.0.0:8000 \
+    --timeout 60 \
+    --access-logfile /var/log/nexora/access.log \
+    --error-logfile /var/log/nexora/error.log \
+    apps.nexora-home.app:app
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGTERM
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
