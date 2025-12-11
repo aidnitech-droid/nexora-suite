@@ -340,9 +340,10 @@ def register_module_routes():
             served_frontend = False
             if os.path.isdir(frontend_dir):
                 # Prefer a built 'dist' directory when present
-                dist_dir = os.path.join(frontend_dir, 'dist') if os.path.isdir(os.path.join(frontend_dir, 'dist')) else frontend_dir
-                index_html = os.path.join(dist_dir, 'index.html')
-                if os.path.exists(index_html):
+                dist_dir = os.path.join(frontend_dir, 'dist') if os.path.isdir(os.path.join(frontend_dir, 'dist')) else None
+                
+                # Only serve from dist if it exists and has index.html
+                if dist_dir and os.path.exists(os.path.join(dist_dir, 'index.html')):
                     from flask import send_from_directory
 
                     def make_index_handler(dpath):
@@ -360,7 +361,23 @@ def register_module_routes():
 
                     app.add_url_rule(f"/module/{module_name}/static/<path:filename>", endpoint=f"{module_name}_frontend_static", view_func=make_static_handler(dist_dir), methods=['GET'])
                     app.add_url_rule(f"/module/{module_name}/assets/<path:filename>", endpoint=f"{module_name}_frontend_assets", view_func=make_static_handler(dist_dir), methods=['GET'])
+                    # Also serve src/ and other static paths for development
+                    app.add_url_rule(f"/module/{module_name}/src/<path:filename>", endpoint=f"{module_name}_frontend_src", view_func=make_static_handler(dist_dir), methods=['GET'])
                     served_frontend = True
+                else:
+                    # Source frontend exists but not built - serve fallback template instead
+                    # (Will be handled below)
+                    pass
+            
+            # If no built frontend was found, create a fallback module dashboard
+            if not served_frontend:
+                def make_fallback_handler(mname):
+                    @login_required
+                    def fallback_handler():
+                        return render_template('module_fallback.html', module_name=mname)
+                    return fallback_handler
+                app.add_url_rule(f"/module/{module_name}/", endpoint=f"{module_name}_fallback", view_func=make_fallback_handler(module_name), methods=['GET'])
+                served_frontend = True
 
             # Extract and register routes from module app
             for rule in list(module_app.url_map.iter_rules()):
