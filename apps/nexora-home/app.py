@@ -232,58 +232,9 @@ def dashboard():
 @app.route('/module/<module_name>')
 @login_required
 def module_detail(module_name):
-    apps_root = APPS_DIR
-    path = os.path.join(apps_root, module_name)
-    if not os.path.isdir(path):
-        return "Not found", 404
-    # Try to obtain a descriptive README or docstring
-    def get_module_description(path):
-        for fname in ('README.md', 'README.MD', 'README', 'README.txt'):
-            fpath = os.path.join(path, fname)
-            if os.path.exists(fpath):
-                try:
-                    with open(fpath, 'r', encoding='utf-8') as fh:
-                        return fh.read()
-                except Exception:
-                    break
-        for candidate in ('app.py', '__init__.py'):
-            fpath = os.path.join(path, candidate)
-            if os.path.exists(fpath):
-                try:
-                    src = open(fpath, 'r', encoding='utf-8').read()
-                    module = ast.parse(src)
-                    doc = ast.get_docstring(module)
-                    if doc:
-                        return doc
-                except Exception:
-                    pass
-        return None
-
-    readme = get_module_description(path)
-
-    # Try to detect a health endpoint in source files
-    suggested_health = None
-    for candidate in ('app.py',):
-        fpath = os.path.join(path, candidate)
-        if os.path.exists(fpath):
-            try:
-                text = open(fpath, 'r', encoding='utf-8').read()
-                if '/api/health' in text or 'def health' in text:
-                    # Build a host-aware URL so this works on PythonAnywhere or other hosts
-                    host = request.host_url.rstrip('/')
-                    # If the host is localhost, keep http; otherwise use the provided scheme
-                    suggested_health = f"{host}/{module_name}/api/health"
-                    break
-            except Exception:
-                pass
-
-    info = {
-        'name': module_name,
-        'path': path,
-        'readme': readme,
-        'suggested_health_url': suggested_health
-    }
-    return render_template('module.html', module=info)
+    # Redirect to the actual module served by the dispatcher
+    # The module is mounted at /<module_name>/ by wsgi.py DispatcherMiddleware
+    return redirect(f'/{module_name}/')
 
 
 @app.route('/api/nexora-home/modules', methods=['GET'])
