@@ -167,66 +167,71 @@ def logout():
 @login_required
 def dashboard():
     user = User.query.get(session['user_id'])
-    # discover modules (folders under apps/)
+    
+    # Get list of integrated modules with metadata
+    modules = get_integrated_modules()
+    
+    return render_template('dashboard.html', user=user, modules=modules)
+
+
+def get_integrated_modules():
+    """
+    Get all integrated modules with their metadata.
+    Returns a list of module info dicts with access URLs.
+    """
     apps_root = APPS_DIR
     modules = []
+    
+    # Module descriptions and icons
+    module_info = {
+        'nexora-assist': {'icon': '🤖', 'description': 'AI Assistant & Support'},
+        'nexora-bigin': {'icon': '📊', 'description': 'Business Intelligence'},
+        'nexora-billing': {'icon': '💳', 'description': 'Billing & Payments'},
+        'nexora-bookings': {'icon': '📅', 'description': 'Appointments & Bookings'},
+        'nexora-books': {'icon': '📚', 'description': 'Accounting & Books'},
+        'nexora-checkout': {'icon': '🛒', 'description': 'E-commerce Checkout'},
+        'nexora-commerce': {'icon': '🏪', 'description': 'Commerce & Sales'},
+        'nexora-crm': {'icon': '👥', 'description': 'Customer Relationship'},
+        'nexora-desk': {'icon': '🎫', 'description': 'Help Desk & Support'},
+        'nexora-expense': {'icon': '💰', 'description': 'Expense Management'},
+        'nexora-forms': {'icon': '📝', 'description': 'Form Builder & Surveys'},
+        'nexora-fsm': {'icon': '🔄', 'description': 'Field Service Management'},
+        'nexora-inventory': {'icon': '📦', 'description': 'Inventory Management'},
+        'nexora-invoice': {'icon': '📄', 'description': 'Invoice & Documents'},
+        'nexora-lens': {'icon': '🔍', 'description': 'Analytics & Insights'},
+        'nexora-payments': {'icon': '💵', 'description': 'Payment Processing'},
+        'nexora-payroll': {'icon': '👔', 'description': 'Payroll Management'},
+        'nexora-pos': {'icon': '💾', 'description': 'Point of Sale'},
+        'nexora-practice': {'icon': '🎯', 'description': 'Practice & Training'},
+        'nexora-route': {'icon': '🗺️', 'description': 'Route Planning'},
+        'nexora-routeiq': {'icon': '📍', 'description': 'Route Intelligence'},
+        'nexora-salesiq': {'icon': '📈', 'description': 'Sales Intelligence'},
+        'nexora-service': {'icon': '🔧', 'description': 'Service Management'},
+        'nexora-sign': {'icon': '✍️', 'description': 'Digital Signatures'},
+    }
+    
     try:
-        def get_module_description(path):
-            # Try README files first
-            for fname in ('README.md', 'README.MD', 'README', 'README.txt'):
-                fpath = os.path.join(path, fname)
-                if os.path.exists(fpath):
-                    try:
-                        with open(fpath, 'r', encoding='utf-8') as fh:
-                            return fh.read()
-                    except Exception:
-                        break
-            # Next, try package.json in frontend or module root for a description
-            for pkg_loc in (os.path.join(path, 'frontend', 'package.json'), os.path.join(path, 'package.json')):
-                if os.path.exists(pkg_loc):
-                    try:
-                        with open(pkg_loc, 'r', encoding='utf-8') as fh:
-                            pj = json.load(fh)
-                            desc = pj.get('description')
-                            if desc:
-                                return desc
-                    except Exception:
-                        pass
-            # Fallback: try to extract top-level docstring from app.py or __init__.py
-            for candidate in ('app.py', '__init__.py'):
-                fpath = os.path.join(path, candidate)
-                if os.path.exists(fpath):
-                    try:
-                        src = open(fpath, 'r', encoding='utf-8').read()
-                        module = ast.parse(src)
-                        doc = ast.get_docstring(module)
-                        if doc:
-                            return doc
-                    except Exception:
-                        pass
-            return None
-
         for name in sorted(os.listdir(apps_root)):
             path = os.path.join(apps_root, name)
-            if os.path.isdir(path):
-                readme = get_module_description(path)
-                # detect health endpoint suggestion
-                suggested_health = None
-                for candidate in ('app.py',):
-                    fpath = os.path.join(path, candidate)
-                    if os.path.exists(fpath):
-                        try:
-                            text = open(fpath, 'r', encoding='utf-8').read()
-                            if '/api/health' in text or 'def health' in text:
-                                host = request.host_url.rstrip('/')
-                                suggested_health = f"{host}/{name}/api/health"
-                                break
-                        except Exception:
-                            pass
-                modules.append({'name': name, 'path': path, 'readme': readme, 'suggested_health': suggested_health})
-    except Exception:
-        modules = []
-    return render_template('dashboard.html', user=user, modules=modules)
+            if os.path.isdir(path) and name != 'nexora-home':
+                # Get module info
+                info = module_info.get(name, {'icon': '⚙️', 'description': name.replace('nexora-', '').title()})
+                
+                # Get health endpoint URL
+                health_url = f"/module/{name}/api/health"
+                
+                modules.append({
+                    'name': name,
+                    'display_name': name.replace('nexora-', '').replace('-', ' ').title(),
+                    'icon': info['icon'],
+                    'description': info['description'],
+                    'health_url': health_url,
+                    'access_url': f"/module/{name}/"
+                })
+    except Exception as e:
+        print(f"Error loading modules: {e}")
+    
+    return modules
 
 
 @app.route('/module/<module_name>')
